@@ -1,7 +1,7 @@
 {
-    "name": "laravel/telescope",
+    "name": "colbeh/telescope",
     "description": "An elegant debug assistant for the Laravel framework.",
-    "keywords": ["laravel", "monitoring", "debugging"],
+    "keywords": ["colbeh","laravel", "monitoring", "debugging"],
     "license": "MIT",
     "authors": [
         {
@@ -11,6 +11,10 @@
         {
             "name": "Mohamed Said",
             "email": "mohamed@laravel.com"
+        },
+        {
+            "name": "Arman Taghiyan",
+            "email": "taghiyan98@gmail.com"
         }
     ],
     "require": {

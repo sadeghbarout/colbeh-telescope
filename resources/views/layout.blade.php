@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="shortcut icon" href="{{ asset('/vendor/telescope/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ asset('/vendor/telescope/logo.png') }}">
 
     <meta name="robots" content="noindex, nofollow">
 
@@ -26,11 +26,17 @@
 
     <div class="container mb-5">
         <div class="d-flex align-items-center py-4 header">
-            <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
-                <path class="fill-primary" d="M0 40a39.87 39.87 0 0 1 11.72-28.28A40 40 0 1 1 0 40zm34 10a4 4 0 0 1-4-4v-2a2 2 0 1 0-4 0v2a4 4 0 0 1-4 4h-2a2 2 0 1 0 0 4h2a4 4 0 0 1 4 4v2a2 2 0 1 0 4 0v-2a4 4 0 0 1 4-4h2a2 2 0 1 0 0-4h-2zm24-24a6 6 0 0 1-6-6v-3a3 3 0 0 0-6 0v3a6 6 0 0 1-6 6h-3a3 3 0 0 0 0 6h3a6 6 0 0 1 6 6v3a3 3 0 0 0 6 0v-3a6 6 0 0 1 6-6h3a3 3 0 0 0 0-6h-3zm-4 36a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM21 28a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
-            </svg>
-
-            <h4 class="mb-0 ml-3"><strong>Laravel</strong> Telescope{{ config('app.name') ? ' - ' . config('app.name') : '' }}</h4>
+            <div class="d-flex flex-column">
+                <div class="d-flex justify-content-center align-items-center">
+                    <img src="{{asset('/vendor/telescope/logo.png')}}" alt="Logo" style="height: 35px">
+                    <h4 class="mb-0 ml-3"><strong>Colbeh</strong> Telescope{{ config('app.name') ? ' - ' . config('app.name') : '' }}</h4>
+                </div>
+                <div>
+                    <div>
+                        <span class="pt-2 text-muted" style="font-size: 13px;">Server Timezone: {{config('app.timezone')}}({{now()}})</span>
+                    </div>
+                </div>
+            </div>
 
             <button class="btn btn-outline-primary ml-auto mr-3" v-on:click.prevent="toggleRecording" title="Play/Pause">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="icon fill-primary" v-if="recording">

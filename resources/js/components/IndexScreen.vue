@@ -33,6 +33,16 @@
 
                 updateEntriesTimeout: null,
                 updateEntriesTimer: 2500,
+
+                startTime:'',
+                endTime:'',
+                aroundTime:'',
+                path:'',
+                method:'',
+                sort:'desc',
+                useTimeZone: false,
+                useTimeZoneValue: 0,
+                searchContent:'',
             };
         },
 
@@ -41,6 +51,18 @@
          * Prepare the component.
          */
         mounted() {
+            this.$router.push({query: _.assign({}, this.$route.query, {
+                tag: '',
+                startTime: '',
+                endTime: '',
+                aroundTime: '',
+                path: '',
+                method: '',
+                sort: 'desc',
+                useTimeZone: 'false',
+                searchContent: ''
+            })});
+
             document.title = this.title + " - Telescope";
 
             this.familyHash = this.$route.query.family_hash || '';
@@ -100,6 +122,9 @@
                     this.ready = true;
                 });
             },
+            useTimeZone: function (){
+                this.useTimeZoneValue = (this.useTimeZone)? 1:0
+            }
         },
 
 
@@ -109,7 +134,15 @@
                         '?tag=' + this.tag +
                         '&before=' + this.lastEntryIndex +
                         '&take=' + this.entriesPerRequest +
-                        '&family_hash=' + this.familyHash
+                        '&family_hash=' + this.familyHash +
+                        '&start_time=' + this.startTime +
+                        '&end_time=' + this.endTime+
+                        '&around_time=' + this.aroundTime+
+                        '&path=' + this.path+
+                        '&method=' + this.method+
+                        '&sort=' + this.sort+
+                        '&use_time_zone=' + this.useTimeZoneValue+
+                        '&search=' + this.searchContent
                 ).then(response => {
                     this.lastEntryIndex = response.data.entries.length ? _.last(response.data.entries).sequence : this.lastEntryIndex;
 
@@ -131,27 +164,34 @@
              */
             checkForNewEntries(){
                 this.newEntriesTimeout = setTimeout(() => {
-                    axios.post(Telescope.basePath + '/telescope-api/' + this.resource +
-                            '?tag=' + this.tag +
-                            '&take=1' +
-                            '&family_hash=' + this.familyHash
-                    ).then(response => {
-                        if (! this._isDestroyed) {
-                            this.recordingStatus = response.data.status;
-
-                            if (response.data.entries.length && !this.entries.length) {
+                axios.post(Telescope.basePath + '/telescope-api/' + this.resource +
+                    '?tag=' + this.tag +
+                    '&take=1' +
+                    '&family_hash=' + this.familyHash +
+                    '&start_time=' + this.startTime +
+                    '&end_time=' + this.endTime +
+                    '&around_time=' + this.aroundTime +
+                    '&path=' + this.path +
+                    '&method=' + this.method +
+                    '&sort=' + this.sort+
+                    '&use_time_zone=' + this.useTimeZoneValue+
+                    '&search=' + this.searchContent
+                ).then(response => {
+                    if (!this._isDestroyed) {
+                        this.recordingStatus = response.data.status;
+                        if (response.data.entries.length && !this.entries.length) {
+                            this.loadNewEntries();
+                        } else if (response.data.entries.length && _.first(response.data.entries).id !== _.first(this.entries).id) {
+                            if (this.$root.autoLoadsNewEntries) {
                                 this.loadNewEntries();
-                            } else if (response.data.entries.length && _.first(response.data.entries).id !== _.first(this.entries).id) {
-                                if (this.$root.autoLoadsNewEntries) {
-                                    this.loadNewEntries();
-                                } else {
-                                    this.hasNewEntries = true;
-                                }
                             } else {
-                                this.checkForNewEntries();
+                                this.hasNewEntries = true;
                             }
+                        } else {
+                            this.checkForNewEntries();
                         }
-                    })
+                    }
+                })
                 }, this.newEntriesTimer);
             },
 
@@ -180,7 +220,17 @@
 
                     clearTimeout(this.newEntriesTimeout);
 
-                    this.$router.push({query: _.assign({}, this.$route.query, {tag: this.tag})});
+                    this.$router.push({query: _.assign({}, this.$route.query, {
+                            tag: this.tag,
+                            searchContent: this.searchContent,
+                            startTime: this.startTime,
+                            endTime: this.endTime,
+                            aroundTime: this.aroundTime,
+                            path: this.path,
+                            method: this.method,
+                            sort: this.sort,
+                            useTimeZone: this.useTimeZone
+                        })});
                 });
             },
 
@@ -257,24 +307,91 @@
                         let searchInput = document.getElementById("searchInput");
 
                         if (searchInput) {
-                            searchInput.focus();
+                            // searchInput.focus();
                         }
                     }
                 };
-            }
+            },
+
+            /**
+            * clear all search box
+            */
+            resetFilter(){
+                this.startTime =''
+                this.endTime =''
+                this.aroundTime =''
+                this.path =''
+                this.method =''
+                this.sort ='desc'
+                this.tag =''
+                this.searchContent =''
+                this.useTimeZone = false
+            },
         }
     }
 </script>
 
 <template>
     <div class="card">
-        <div class="card-header d-flex align-items-center justify-content-between">
-            <h5>{{this.title}}</h5>
+        <div class="card-header d-flex flex-column">
+            <h5 class="mb-3">{{this.title}}</h5>
 
-            <input type="text" class="form-control w-25"
-                   v-if="!hideSearch && (tag || entries.length > 0)"
-                   id="searchInput"
-                   placeholder="Search Tag" v-model="tag" @input.stop="search">
+            <div class="row">
+                <div class="d-flex flex-column col-3">
+                    <input type="text" class="form-control m-1"
+                           id="startTime"
+                           placeholder="Start Time" v-model="startTime" @input.stop="search">
+
+                    <input type="text" class="form-control m-1"
+                           id="endTime"
+                           placeholder="End Time" v-model="endTime" @input.stop="search">
+                </div>
+                <div class="d-flex flex-column col-3">
+                    <input type="text" class="form-control m-1"
+                           id="aroundTime"
+                           placeholder="Around Time" v-model="aroundTime" @input.stop="search">
+
+                    <input type="text" class="form-control m-1"
+                           id="path"
+                           placeholder="Path" v-model="path" @input.stop="search">
+
+                </div>
+                <div class="d-flex flex-column col-3">
+                    <select id="inputState" class="form-control m-1" v-model="method" @input.stop="search">
+                        <option selected value="">ALL</option>
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="PATCH">PATCH</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="OPTIONS">OPTIONS</option>
+                    </select>
+                    <select id="inputState" class="form-control m-1" v-model="sort" @input.stop="search">
+                        <option selected value="desc">DESC</option>
+                        <option value="asc">ASC</option>
+                    </select>
+                </div>
+                <div class="d-flex flex-column col-3">
+                    <input type="text" class="form-control m-1"
+                           id="searchContent"
+                           placeholder="Search" v-model="searchContent" @input.stop="search">
+
+                    <input type="text" class="form-control m-1"
+                           id="searchInput"
+                           placeholder="Search Tag" v-model="tag" @input.stop="search">
+                </div>
+                <div class="d-flex flex-column col-3">
+                    <div class="form-check m-1">
+                        <input class="form-check-input" type="checkbox" value="" id="useTimeZone" v-model="useTimeZone" @input.stop="search">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            Use UTC
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="p-1">
+                <button type="button" class="btn btn-secondary" @click="resetFilter()">Reset Filters</button>
+            </div>
         </div>
 
         <p v-if="recordingStatus !== 'enabled'" class="mt-0 mb-0 disabled-watcher d-flex align-items-center">

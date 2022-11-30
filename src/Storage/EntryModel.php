@@ -69,6 +69,13 @@ class EntryModel extends Model
                 ->whereTag($query, $options)
                 ->whereFamilyHash($query, $options)
                 ->whereBeforeSequence($query, $options)
+                ->whereStartTime($query, $options)
+                ->whereEndTime($query, $options)
+                ->whereAroundTime($query, $options)
+                ->wherePath($query, $options)
+                ->whereMethod($query, $options)
+                ->whereSearch($query, $options)
+                ->sort($query, $options)
                 ->filter($query, $options);
 
         return $query;
@@ -173,6 +180,121 @@ class EntryModel extends Model
 
         return $this;
     }
+
+
+
+	/**
+	 * Scope the query for the given type.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Laravel\Telescope\Storage\EntryQueryOptions  $options
+	 * @return $this
+	 */
+	protected function whereStartTime($query, EntryQueryOptions $options)
+	{
+		$query->when($options->startTime, function ($query, $startTime) {
+			return $query->where('created_at', '>', $startTime);
+		});
+
+		return $this;
+	}
+
+	/**
+	 * Scope the query for the given type.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Laravel\Telescope\Storage\EntryQueryOptions  $options
+	 * @return $this
+	 */
+	protected function whereEndTime($query, EntryQueryOptions $options)
+	{
+		$query->when($options->endTime, function ($query, $endTime) {
+			return $query->where('created_at', '<', $endTime);
+		});
+
+		return $this;
+	}
+
+	/**
+	 * Scope the query for the given type.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Laravel\Telescope\Storage\EntryQueryOptions  $options
+	 * @return $this
+	 */
+	protected function whereAroundTime($query, EntryQueryOptions $options)
+	{
+		$query->when($options->aroundTime, function ($query,$aroundTime) {
+			return $query->where('created_at', 'LIKE', "%$aroundTime%");
+		});
+
+		return $this;
+	}
+
+	/**
+	 * Scope the query for the given type.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Laravel\Telescope\Storage\EntryQueryOptions  $options
+	 * @return $this
+	 */
+	protected function wherePath($query, EntryQueryOptions $options)
+	{
+		$query->when($options->path, function ($query,$path) {
+			$pathReformat = str_replace("/", '\\\\/' , $path);
+			return $query->where('content', 'LIKE', '%'.$pathReformat.'%');
+		});
+
+		return $this;
+	}
+
+	/**
+	 * Scope the query for the given type.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Laravel\Telescope\Storage\EntryQueryOptions  $options
+	 * @return $this
+	 */
+	protected function whereMethod($query, EntryQueryOptions $options)
+	{
+		$query->when($options->method, function ($query,$method) {
+			return $query->where('content', 'LIKE', '%"method":"'.$method.'"%');
+		});
+
+		return $this;
+	}
+
+	/**
+	 * Scope the query for the given type.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Laravel\Telescope\Storage\EntryQueryOptions  $options
+	 * @return $this
+	 */
+	protected function whereSearch($query, EntryQueryOptions $options)
+	{
+		$query->when($options->search, function ($query,$search) {
+			return $query->where('content', 'LIKE', "%$search%");
+		});
+
+		return $this;
+	}
+
+	/**
+	 * Scope the query for the given type.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Laravel\Telescope\Storage\EntryQueryOptions  $options
+	 * @return $this
+	 */
+	protected function sort($query, EntryQueryOptions $options)
+	{
+		$query->when($options->sort, function ($query,$sort) {
+			return $query->orderBy('sequence', $sort);
+		});
+
+		return $this;
+	}
 
     /**
      * Get the current connection name for the model.
