@@ -92,12 +92,22 @@ class EntryQueryOptions
      */
     public $search;
 
+	/**
+	 * The number of entries to retrieve.
+	 *
+	 * @var int
+	 */
+	public $status_code;
+
     /**
      * The number of entries to retrieve.
      *
      * @var int
      */
     public $limit = 50;
+
+
+
 
     /**
      * Create new entry query options from the incoming request.
@@ -119,6 +129,7 @@ class EntryQueryOptions
                 ->path($request->path)
                 ->method($request->method)
                 ->sort($request->sort)
+                ->statusCode($request->status_code)
                 ->search($request->search)
                 ->limit($request->take ?? 50);
     }
@@ -272,6 +283,19 @@ class EntryQueryOptions
 	public function sort(?string $sort)
 	{
 		$this->sort = $sort;
+
+		return $this;
+	}
+
+	/**
+	 * Set the family hash that must belong to retrieved entries.
+	 *
+	 * @param  string  $familyHash
+	 * @return $this
+	 */
+	public function statusCode(?string $statusCode)
+	{
+		$this->statusCode = $statusCode;
 
 		return $this;
 	}

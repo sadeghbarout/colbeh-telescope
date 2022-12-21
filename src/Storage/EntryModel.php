@@ -76,6 +76,7 @@ class EntryModel extends Model
                 ->whereMethod($query, $options)
                 ->whereSearch($query, $options)
                 ->sort($query, $options)
+                ->statusCode($query, $options)
                 ->filter($query, $options);
 
         return $query;
@@ -291,6 +292,22 @@ class EntryModel extends Model
 	{
 		$query->when($options->sort, function ($query,$sort) {
 			return $query->orderBy('sequence', $sort);
+		});
+
+		return $this;
+	}
+
+	/**
+	 * Scope the query for the given type.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Laravel\Telescope\Storage\EntryQueryOptions  $options
+	 * @return $this
+	 */
+	protected function statusCode($query, EntryQueryOptions $options)
+	{
+		$query->when($options->statusCode, function ($query,$statusCode) {
+			return $query->where('content', 'LIKE',  '%"response_status":'.$statusCode. '%');
 		});
 
 		return $this;

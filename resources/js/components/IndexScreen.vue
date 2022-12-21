@@ -37,6 +37,7 @@
                 startTime:'',
                 endTime:'',
                 aroundTime:'',
+                statusCode:'',
                 path:'',
                 method:'',
                 sort:'desc',
@@ -56,6 +57,7 @@
                 startTime: '',
                 endTime: '',
                 aroundTime: '',
+                statusCode: '',
                 path: '',
                 method: '',
                 sort: 'desc',
@@ -138,6 +140,7 @@
                         '&start_time=' + this.startTime +
                         '&end_time=' + this.endTime+
                         '&around_time=' + this.aroundTime+
+                        '&status_code=' + this.statusCode+
                         '&path=' + this.path+
                         '&method=' + this.method+
                         '&sort=' + this.sort+
@@ -171,6 +174,7 @@
                     '&start_time=' + this.startTime +
                     '&end_time=' + this.endTime +
                     '&around_time=' + this.aroundTime +
+                    '&status_code=' + this.statusCode +
                     '&path=' + this.path +
                     '&method=' + this.method +
                     '&sort=' + this.sort+
@@ -226,6 +230,7 @@
                             startTime: this.startTime,
                             endTime: this.endTime,
                             aroundTime: this.aroundTime,
+                            statusCode: this.statusCode,
                             path: this.path,
                             method: this.method,
                             sort: this.sort,
@@ -320,6 +325,7 @@
                 this.startTime =''
                 this.endTime =''
                 this.aroundTime =''
+                this.statusCode =''
                 this.path =''
                 this.method =''
                 this.sort ='desc'
@@ -345,6 +351,10 @@
                     <input type="text" class="form-control m-1"
                            id="endTime"
                            placeholder="End Time" v-model="endTime" @input.stop="search">
+
+                    <input type="text" class="form-control m-1"
+                           id="statusCode"
+                           placeholder="Status code" v-model="statusCode" @input.stop="search">
                 </div>
                 <div class="d-flex flex-column col-3">
                     <input type="text" class="form-control m-1"

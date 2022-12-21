@@ -88,5 +88,16 @@ new Vue({
                 axios.delete(Telescope.basePath + '/telescope-api/entries').then((response) => location.reload());
             }
         },
+
+        removeEntries() {
+            const res = confirm("Do you want entries from the previous 10 days to be deleted?");
+
+            if(res){
+                axios.delete(Telescope.basePath + '/telescope-api/remove')
+                    .then((res) => {
+                        alert('Previous 10 days entries successfully deleted');
+                    })
+            }
+        },
     },
 });

@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 // Mail entries...
@@ -88,3 +90,13 @@ Route::post('/telescope-api/toggle-recording', 'RecordingController@toggle');
 Route::delete('/telescope-api/entries', 'EntriesController@destroy');
 
 Route::get('/{view?}', 'HomeController@index')->where('view', '(.*)')->name('telescope');
+
+
+Route::delete('/telescope-api/remove', function (){
+	DB::table('telescope_entries_tags')->delete();
+	DB::table('telescope_monitoring')->delete();
+
+	$date = now()->subDays(10);
+	DB::table('telescope_entries')->whereDate('created_at', '<=', $date)->delete();
+	return 'Telescope Cleared';
+});
