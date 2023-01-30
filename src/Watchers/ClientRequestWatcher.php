@@ -58,6 +58,11 @@ class ClientRequestWatcher extends Watcher
             return;
         }
 
+		$duration = null;
+		if(isset($event->response->handlerStats()['total_time'])){
+			$duration = round($event->response->handlerStats()['total_time'] * 1000);
+		}
+
         Telescope::recordClientRequest(IncomingEntry::make([
             'method' => $event->request->method(),
             'uri' => $event->request->url(),
@@ -66,6 +71,7 @@ class ClientRequestWatcher extends Watcher
             'response_status' => $event->response->status(),
             'response_headers' => $this->headers($event->response->headers()),
             'response' => $this->response($event->response),
+            'duration' => $duration,
         ]));
     }
 

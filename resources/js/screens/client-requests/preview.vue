@@ -29,6 +29,13 @@
         </tr>
 
         <tr>
+            <td class="table-fit font-weight-bold">Duration</td>
+            <td v-if="slotProps.entry.content.duration !== undefined">
+                {{slotProps.entry.content.duration}} ms
+            </td>
+        </tr>
+
+        <tr>
             <td class="table-fit font-weight-bold">Status</td>
             <td>
                 {{slotProps.entry.content.response_status !== undefined ? slotProps.entry.content.response_status : 'N/A'}}

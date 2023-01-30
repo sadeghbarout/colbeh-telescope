@@ -594,6 +594,7 @@
                     <th>URI</th>
                     <th>Status</th>
                     <th>Happened</th>
+                    <th>Duration</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -616,6 +617,12 @@
 
                     <td class="table-fit" :data-timeago="entry.created_at" :title="entry.created_at">
                         {{timeAgo(entry.created_at)}}
+                    </td>
+
+                    <td class="table-fit">
+                        <span v-if="entry.content.duration !== undefined">
+                            {{entry.content.duration}} ms
+                        </span>
                     </td>
 
                     <td class="table-fit">
