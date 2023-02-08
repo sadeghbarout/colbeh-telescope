@@ -113,7 +113,7 @@ class ClientRequestWatcher extends Watcher
             }
 
             if (Str::startsWith(strtolower($response->header('Content-Type') ?? ''), 'text/plain')) {
-                return $this->contentWithinLimits($content) ? $content : 'Purged By Telescope';
+                return $this->contentWithinLimits($content) ? $content : 'Purged By Telescope: \n ' . Str::limit($content, 1000);
             }
         }
 
@@ -124,6 +124,8 @@ class ClientRequestWatcher extends Watcher
         if (empty($content)) {
             return 'Empty Response';
         }
+
+		return $content;
 
         return 'HTML Response';
     }
