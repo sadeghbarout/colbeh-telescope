@@ -37,6 +37,7 @@
                 startTime:'',
                 endTime:'',
                 aroundTime:'',
+                ipAddress:'',
                 statusCode:'',
                 path:'',
                 method:'',
@@ -57,6 +58,7 @@
                 startTime: '',
                 endTime: '',
                 aroundTime: '',
+                ipAddress: '',
                 statusCode: '',
                 path: '',
                 method: '',
@@ -140,6 +142,7 @@
                         '&start_time=' + this.startTime +
                         '&end_time=' + this.endTime+
                         '&around_time=' + this.aroundTime+
+                        '&ip_address=' + this.ipAddress+
                         '&status_code=' + this.statusCode+
                         '&path=' + this.path+
                         '&method=' + this.method+
@@ -174,6 +177,7 @@
                     '&start_time=' + this.startTime +
                     '&end_time=' + this.endTime +
                     '&around_time=' + this.aroundTime +
+                    '&ip_address=' + this.ipAddress +
                     '&status_code=' + this.statusCode +
                     '&path=' + this.path +
                     '&method=' + this.method +
@@ -230,6 +234,7 @@
                             startTime: this.startTime,
                             endTime: this.endTime,
                             aroundTime: this.aroundTime,
+                            ipAddress: this.ipAddress,
                             statusCode: this.statusCode,
                             path: this.path,
                             method: this.method,
@@ -325,6 +330,7 @@
                 this.startTime =''
                 this.endTime =''
                 this.aroundTime =''
+                this.ipAddress =''
                 this.statusCode =''
                 this.path =''
                 this.method =''
@@ -364,6 +370,10 @@
                     <input type="text" class="form-control m-1"
                            id="path"
                            placeholder="Path" v-model="path" @input.stop="search">
+
+                    <input type="text" class="form-control m-1"
+                           id="ipAddress"
+                           placeholder="Ip Address" v-model="ipAddress" @input.stop="search">
 
                 </div>
                 <div class="d-flex flex-column col-3">

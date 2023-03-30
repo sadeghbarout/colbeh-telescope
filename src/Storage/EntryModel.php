@@ -72,6 +72,7 @@ class EntryModel extends Model
                 ->whereStartTime($query, $options)
                 ->whereEndTime($query, $options)
                 ->whereAroundTime($query, $options)
+                ->whereIpAddress($query, $options)
                 ->wherePath($query, $options)
                 ->whereMethod($query, $options)
                 ->whereSearch($query, $options)
@@ -227,6 +228,15 @@ class EntryModel extends Model
 	{
 		$query->when($options->aroundTime, function ($query,$aroundTime) {
 			return $query->where('created_at', 'LIKE', "%$aroundTime%");
+		});
+
+		return $this;
+	}
+
+	protected function whereIpAddress($query, EntryQueryOptions $options)
+	{
+		$query->when($options->ipAddress, function ($query,$ipAddress) {
+			return $query->where('content', 'LIKE', '%"ip_address":"'.$ipAddress.'"%');
 		});
 
 		return $this;

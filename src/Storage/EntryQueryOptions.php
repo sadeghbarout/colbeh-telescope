@@ -69,6 +69,13 @@ class EntryQueryOptions
      *
      * @var string
      */
+    public $ipAddress;
+
+	/**
+     * The list of UUIDs of entries tor retrieve.
+     *
+     * @var string
+     */
     public $path;
 
 	/**
@@ -126,6 +133,7 @@ class EntryQueryOptions
                 ->startTime($request->start_time, $request->use_time_zone)
                 ->endTime($request->end_time, $request->use_time_zone)
                 ->aroundTime($request->around_time)
+                ->ipAddress($request->ip_address)
                 ->path($request->path)
                 ->method($request->method)
                 ->sort($request->sort)
@@ -244,6 +252,18 @@ class EntryQueryOptions
 	public function aroundTime(?string $aroundTime)
 	{
 		$this->aroundTime = $aroundTime;
+
+		return $this;
+	}
+	/**
+	 * Set the family hash that must belong to retrieved entries.
+	 *
+	 * @param  string  $familyHash
+	 * @return $this
+	 */
+	public function ipAddress(?string $ipAddress)
+	{
+		$this->ipAddress = $ipAddress;
 
 		return $this;
 	}
