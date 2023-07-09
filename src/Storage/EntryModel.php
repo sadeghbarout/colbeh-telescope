@@ -316,8 +316,8 @@ class EntryModel extends Model
 	 */
 	protected function statusCode($query, EntryQueryOptions $options)
 	{
-		$query->when($options->status_code, function ($query,$statusCode) {
-			return $query->where('content', 'LIKE',  '%"response_status":'.$statusCode. '%');
+		$query->when($options->statusCode, function ($query,$statusCode) {
+			return $query->where('content', 'LIKE', '%"response_status":'.$statusCode.'%');
 		});
 
 		return $this;
