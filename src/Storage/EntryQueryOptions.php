@@ -104,7 +104,7 @@ class EntryQueryOptions
 	 *
 	 * @var int
 	 */
-	public $status_code;
+	public $statusCode;
 
     /**
      * The number of entries to retrieve.
