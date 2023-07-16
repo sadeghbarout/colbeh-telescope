@@ -45,6 +45,7 @@
                 useTimeZone: false,
                 useTimeZoneValue: 0,
                 searchContent:'',
+                searchNot:'',
             };
         },
 
@@ -64,7 +65,8 @@
                 method: '',
                 sort: 'desc',
                 useTimeZone: 'false',
-                searchContent: ''
+                searchContent: '',
+                searchNot: '',
             })});
 
             document.title = this.title + " - Telescope";
@@ -148,7 +150,8 @@
                         '&method=' + this.method+
                         '&sort=' + this.sort+
                         '&use_time_zone=' + this.useTimeZoneValue+
-                        '&search=' + this.searchContent
+                        '&search=' + this.searchContent+
+                        '&searchNot=' + this.searchNot
                 ).then(response => {
                     this.lastEntryIndex = response.data.entries.length ? _.last(response.data.entries).sequence : this.lastEntryIndex;
 
@@ -183,7 +186,8 @@
                     '&method=' + this.method +
                     '&sort=' + this.sort+
                     '&use_time_zone=' + this.useTimeZoneValue+
-                    '&search=' + this.searchContent
+                    '&search=' + this.searchContent+
+                    '&searchNot=' + this.searchNot
                 ).then(response => {
                     if (!this._isDestroyed) {
                         this.recordingStatus = response.data.status;
@@ -231,6 +235,7 @@
                     this.$router.push({query: _.assign({}, this.$route.query, {
                             tag: this.tag,
                             searchContent: this.searchContent,
+                            searchNot: this.searchNot,
                             startTime: this.startTime,
                             endTime: this.endTime,
                             aroundTime: this.aroundTime,
@@ -337,6 +342,7 @@
                 this.sort ='desc'
                 this.tag =''
                 this.searchContent =''
+                this.searchNot =''
                 this.useTimeZone = false
             },
         }
@@ -390,6 +396,9 @@
                         <option selected value="desc">DESC</option>
                         <option value="asc">ASC</option>
                     </select>
+                    <input type="text" class="form-control m-1"
+                           id="searchNot"
+                           placeholder="Search (Find not contain)" v-model="searchNot" @input.stop="search">
                 </div>
                 <div class="d-flex flex-column col-3">
                     <input type="text" class="form-control m-1"

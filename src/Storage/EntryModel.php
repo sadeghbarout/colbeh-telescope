@@ -76,6 +76,7 @@ class EntryModel extends Model
                 ->wherePath($query, $options)
                 ->whereMethod($query, $options)
                 ->whereSearch($query, $options)
+                ->whereSearchNot($query, $options)
                 ->sort($query, $options)
                 ->statusCode($query, $options)
                 ->filter($query, $options);
@@ -286,6 +287,22 @@ class EntryModel extends Model
 	{
 		$query->when($options->search, function ($query,$search) {
 			return $query->where('content', 'LIKE', "%$search%");
+		});
+
+		return $this;
+	}
+
+	/**
+	 * Scope the query for the given type.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
+	 * @param  \Laravel\Telescope\Storage\EntryQueryOptions  $options
+	 * @return $this
+	 */
+	protected function whereSearchNot($query, EntryQueryOptions $options)
+	{
+		$query->when($options->searchNot, function ($query,$searchNot) {
+			return $query->where('content', 'NOT LIKE', "%$searchNot%");
 		});
 
 		return $this;

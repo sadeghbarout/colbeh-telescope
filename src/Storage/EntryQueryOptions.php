@@ -99,6 +99,14 @@ class EntryQueryOptions
      */
     public $search;
 
+
+	/**
+     * The list of UUIDs of entries tor retrieve.
+     *
+     * @var string
+     */
+    public $searchNot;
+
 	/**
 	 * The number of entries to retrieve.
 	 *
@@ -139,6 +147,7 @@ class EntryQueryOptions
                 ->sort($request->sort)
                 ->statusCode($request->status_code)
                 ->search($request->search)
+                ->searchNot($request->searchNot)
                 ->limit($request->take ?? 50);
     }
 
@@ -329,6 +338,19 @@ class EntryQueryOptions
 	public function search(?string $search)
 	{
 		$this->search = $search;
+
+		return $this;
+	}
+
+	/**
+	 * Set the family hash that must belong to retrieved entries.
+	 *
+	 * @param  string  $familyHash
+	 * @return $this
+	 */
+	public function searchNot(?string $searchNot)
+	{
+		$this->searchNot = $searchNot;
 
 		return $this;
 	}
