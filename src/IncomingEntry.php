@@ -312,7 +312,8 @@ class IncomingEntry
     {
         return [
             'uuid' => $this->uuid,
-            'batch_id' => $this->batchId,
+			'ip' => json_decode($this->content, true)['ip_address'] ?? null,
+			'batch_id' => $this->batchId,
             'family_hash' => $this->familyHash,
             'type' => $this->type,
             'content' => $this->content,

@@ -237,7 +237,7 @@ class EntryModel extends Model
 	protected function whereIpAddress($query, EntryQueryOptions $options)
 	{
 		$query->when($options->ipAddress, function ($query,$ipAddress) {
-			return $query->where('content', 'LIKE', '%"ip_address":"'.$ipAddress.'"%');
+			return $query->where('ip', $ipAddress);
 		});
 
 		return $this;
