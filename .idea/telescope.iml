@@ -6,6 +6,8 @@
       <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" packagePrefix="Laravel\Telescope\" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" packagePrefix="Laravel\Telescope\Tests\" />
+      <sourceFolder url="file://$MODULE_DIR$/workbench/app" isTestSource="true" packagePrefix="Workbench\App\" />
+      <sourceFolder url="file://$MODULE_DIR$/workbench/database" isTestSource="true" packagePrefix="Workbench\Database\" />
       <excludeFolder url="file://$MODULE_DIR$/public" />
     </content>
     <orderEntry type="inheritedJdk" />

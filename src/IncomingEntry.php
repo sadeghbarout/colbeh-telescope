@@ -4,6 +4,8 @@ namespace Laravel\Telescope;
 
 use Illuminate\Support\Str;
 use Laravel\Telescope\Contracts\EntriesRepository;
+use Illuminate\Support\Facades\Log;
+use Laravel\Telescope\Watchers\RequestWatcher;
 
 class IncomingEntry
 {
@@ -313,11 +315,12 @@ class IncomingEntry
         return [
             'uuid' => $this->uuid,
 			'ip' => json_decode($this->content, true)['ip_address'] ?? null,
-			'batch_id' => $this->batchId,
+            'batch_id' => $this->batchId,
             'family_hash' => $this->familyHash,
             'type' => $this->type,
             'content' => $this->content,
             'created_at' => $this->recordedAt->toDateTimeString(),
         ];
     }
+
 }

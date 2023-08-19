@@ -58,11 +58,6 @@ class ClientRequestWatcher extends Watcher
             return;
         }
 
-		$duration = null;
-		if(isset($event->response->handlerStats()['total_time'])){
-			$duration = round($event->response->handlerStats()['total_time'] * 1000);
-		}
-
         Telescope::recordClientRequest(IncomingEntry::make([
             'method' => $event->request->method(),
             'uri' => $event->request->url(),
@@ -71,7 +66,7 @@ class ClientRequestWatcher extends Watcher
             'response_status' => $event->response->status(),
             'response_headers' => $this->headers($event->response->headers()),
             'response' => $this->response($event->response),
-            'duration' => $duration,
+            'duration' => $this->duration($event->response),
         ]));
     }
 
@@ -113,12 +108,12 @@ class ClientRequestWatcher extends Watcher
             }
 
             if (Str::startsWith(strtolower($response->header('Content-Type') ?? ''), 'text/plain')) {
-                return $this->contentWithinLimits($content) ? $content : 'Purged By Telescope: \n ' . Str::limit($content, 1000);
+                return $this->contentWithinLimits($content) ? $content : 'Purged By Telescope';
             }
         }
 
         if ($response->redirect()) {
-            return 'Redirected to '.$response->header('Location');
+			return $this->contentWithinLimits($content) ? $content : 'Purged By Telescope: \n ' . Str::limit($content, 1000);
         }
 
         if (empty($content)) {
@@ -126,8 +121,7 @@ class ClientRequestWatcher extends Watcher
         }
 
 		return $content;
-
-        return 'HTML Response';
+		return 'HTML Response';
     }
 
     /**
@@ -142,9 +136,9 @@ class ClientRequestWatcher extends Watcher
             return strtolower($headerName);
         })->toArray();
 
-        $headerValues = collect($headers)->map(function ($value) {
-            return $value[0];
-        })->toArray();
+        $headerValues = collect($headers)
+            ->map(fn ($header) => implode(', ', $header))
+            ->all();
 
         $headers = array_combine($headerNames, $headerValues);
 
@@ -223,5 +217,20 @@ class ClientRequestWatcher extends Watcher
 
             return [$data['name'] => $value];
         })->toArray();
+    }
+
+    /**
+     * Get the request duration in milliseconds.
+     *
+     * @param  \Illuminate\Http\Client\Response  $response
+     * @return int|null
+     */
+    protected function duration(Response $response)
+    {
+        if (property_exists($response, 'transferStats') &&
+            $response->transferStats &&
+            $response->transferStats->getTransferTime()) {
+            return floor($response->transferStats->getTransferTime() * 1000);
+        }
     }
 }

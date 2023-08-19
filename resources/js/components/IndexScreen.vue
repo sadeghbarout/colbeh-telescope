@@ -54,6 +54,7 @@
          * Prepare the component.
          */
         mounted() {
+
             this.$router.push({query: _.assign({}, this.$route.query, {
                 tag: '',
                 startTime: '',
@@ -128,9 +129,6 @@
                     this.ready = true;
                 });
             },
-            useTimeZone: function (){
-                this.useTimeZoneValue = (this.useTimeZone)? 1:0
-            }
         },
 
 
@@ -173,37 +171,38 @@
              */
             checkForNewEntries(){
                 this.newEntriesTimeout = setTimeout(() => {
-                axios.post(Telescope.basePath + '/telescope-api/' + this.resource +
-                    '?tag=' + this.tag +
-                    '&take=1' +
-                    '&family_hash=' + this.familyHash +
-                    '&start_time=' + this.startTime +
-                    '&end_time=' + this.endTime +
-                    '&around_time=' + this.aroundTime +
-                    '&ip_address=' + this.ipAddress +
-                    '&status_code=' + this.statusCode +
-                    '&path=' + this.path +
-                    '&method=' + this.method +
-                    '&sort=' + this.sort+
-                    '&use_time_zone=' + this.useTimeZoneValue+
-                    '&search=' + this.searchContent+
-                    '&searchNot=' + this.searchNot
-                ).then(response => {
-                    if (!this._isDestroyed) {
-                        this.recordingStatus = response.data.status;
-                        if (response.data.entries.length && !this.entries.length) {
-                            this.loadNewEntries();
-                        } else if (response.data.entries.length && _.first(response.data.entries).id !== _.first(this.entries).id) {
-                            if (this.$root.autoLoadsNewEntries) {
+                    axios.post(Telescope.basePath + '/telescope-api/' + this.resource +
+                            '?tag=' + this.tag +
+                            '&take=1' +
+                            '&family_hash=' + this.familyHash +
+                            '&start_time=' + this.startTime +
+                            '&end_time=' + this.endTime +
+                            '&around_time=' + this.aroundTime +
+                            '&ip_address=' + this.ipAddress +
+                            '&status_code=' + this.statusCode +
+                            '&path=' + this.path +
+                            '&method=' + this.method +
+                            '&sort=' + this.sort+
+                            '&use_time_zone=' + this.useTimeZoneValue+
+                            '&search=' + this.searchContent+
+                            '&searchNot=' + this.searchNot
+                    ).then(response => {
+                        if (! this._isDestroyed) {
+                            this.recordingStatus = response.data.status;
+
+                            if (response.data.entries.length && !this.entries.length) {
                                 this.loadNewEntries();
+                            } else if (response.data.entries.length && _.first(response.data.entries).id !== _.first(this.entries).id) {
+                                if (this.$root.autoLoadsNewEntries) {
+                                    this.loadNewEntries();
+                                } else {
+                                    this.hasNewEntries = true;
+                                }
                             } else {
-                                this.hasNewEntries = true;
+                                this.checkForNewEntries();
                             }
-                        } else {
-                            this.checkForNewEntries();
                         }
-                    }
-                })
+                    })
                 }, this.newEntriesTimer);
             },
 
@@ -322,15 +321,15 @@
                         let searchInput = document.getElementById("searchInput");
 
                         if (searchInput) {
-                            // searchInput.focus();
+                            searchInput.focus();
                         }
                     }
                 };
             },
 
             /**
-            * clear all search box
-            */
+             * clear all search box
+             */
             resetFilter(){
                 this.startTime =''
                 this.endTime =''
@@ -350,77 +349,94 @@
 </script>
 
 <template>
-    <div class="card">
+    <div class="card overflow-hidden">
         <div class="card-header d-flex flex-column">
-            <h5 class="mb-3">{{this.title}}</h5>
+            <div class="pb-2 px-1">
+                <h2 class="h6 m-0">{{this.title}}</h2>
+            </div>
 
-            <div class="row">
+            <div class="row w-100">
+
                 <div class="d-flex flex-column col-3">
-                    <input type="text" class="form-control m-1"
-                           id="startTime"
-                           placeholder="Start Time" v-model="startTime" @input.stop="search">
-
-                    <input type="text" class="form-control m-1"
-                           id="endTime"
-                           placeholder="End Time" v-model="endTime" @input.stop="search">
-
-                    <input type="text" class="form-control m-1"
-                           id="statusCode"
-                           placeholder="Status code" v-model="statusCode" @input.stop="search">
+                    <div class="form-control-with-icon py-1">
+                        <input type="text" class="form-control w-100 pl-3" id="startTime" placeholder="Start Time" v-model="startTime" @input.stop="search">
+                    </div>
+                    <div class="form-control-with-icon py-1">
+                        <input type="text" class="form-control w-100 pl-3" id="endTime" placeholder="End Time" v-model="endTime" @input.stop="search">
+                    </div>
+                    <div class="form-control-with-icon py-1">
+                        <input type="text" class="form-control w-100 pl-3" id="statusCode" placeholder="Status code" v-model="statusCode" @input.stop="search">
+                    </div>
                 </div>
+
                 <div class="d-flex flex-column col-3">
-                    <input type="text" class="form-control m-1"
-                           id="aroundTime"
-                           placeholder="Around Time" v-model="aroundTime" @input.stop="search">
-
-                    <input type="text" class="form-control m-1"
-                           id="path"
-                           placeholder="Path" v-model="path" @input.stop="search">
-
-                    <input type="text" class="form-control m-1"
-                           id="ipAddress"
-                           placeholder="Ip Address" v-model="ipAddress" @input.stop="search">
-
+                    <div class="form-control-with-icon py-1">
+                        <input type="text" class="form-control w-100 pl-3" id="aroundTime" placeholder="Around Time"  v-model="aroundTime" @input.stop="search">
+                    </div>
+                    <div class="form-control-with-icon py-1">
+                        <input type="text" class="form-control w-100 pl-3" id="path" placeholder="Path" v-model="path"  @input.stop="search">
+                    </div>
+                    <div class="form-control-with-icon py-1">
+                        <input type="text" class="form-control w-100 pl-3" id="ipAddress" placeholder="Ip Address" v-model="ipAddress" @input.stop="search">
+                    </div>
                 </div>
-                <div class="d-flex flex-column col-3">
-                    <select id="inputState" class="form-control m-1" v-model="method" @input.stop="search">
-                        <option selected value="">ALL</option>
-                        <option value="GET">GET</option>
-                        <option value="POST">POST</option>
-                        <option value="PUT">PUT</option>
-                        <option value="PATCH">PATCH</option>
-                        <option value="DELETE">DELETE</option>
-                        <option value="OPTIONS">OPTIONS</option>
-                    </select>
-                    <select id="inputState" class="form-control m-1" v-model="sort" @input.stop="search">
-                        <option selected value="desc">DESC</option>
-                        <option value="asc">ASC</option>
-                    </select>
-                    <input type="text" class="form-control m-1"
-                           id="searchNot"
-                           placeholder="Search (Find not contain)" v-model="searchNot" @input.stop="search">
-                </div>
-                <div class="d-flex flex-column col-3">
-                    <input type="text" class="form-control m-1"
-                           id="searchContent"
-                           placeholder="Search" v-model="searchContent" @input.stop="search">
 
-                    <input type="text" class="form-control m-1"
-                           id="searchInput"
-                           placeholder="Search Tag" v-model="tag" @input.stop="search">
-                </div>
                 <div class="d-flex flex-column col-3">
-                    <div class="form-check m-1">
-                        <input class="form-check-input" type="checkbox" value="" id="useTimeZone" v-model="useTimeZone" @input.stop="search">
-                        <label class="form-check-label" for="flexCheckDefault">
-                            Use UTC
-                        </label>
+                    <div class="form-control-with-icon py-1">
+                        <select id="inputState" class="form-control pl-3"  v-model="method" @input.stop="search">
+                            <option selected value="">ALL</option>
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="PATCH">PATCH</option>
+                            <option value="DELETE">DELETE</option>
+                            <option value="OPTIONS">OPTIONS</option>
+                        </select>
+                    </div>
+
+                    <div class="form-control-with-icon py-1">
+                        <select id="inputState" class="form-control pl-3"  v-model="sort" @input.stop="search">
+                            <option selected value="desc">DESC</option>
+                            <option value="asc">ASC</option>
+                        </select>
+                    </div>
+
+                    <div class="form-control-with-icon py-1">
+                        <input type="text" class="form-control w-100 pl-3" id="searchNot" placeholder="Search (Find not contain)" v-model="searchNot" @input.stop="search">
+                    </div>
+                </div>
+
+
+                <div class="d-flex flex-column col-3">
+                    <div class="form-control-with-icon py-1">
+                        <input type="text" class="form-control w-100 pl-3" id="searchContent" placeholder="Search" v-model="searchContent" @input.stop="search">
+                    </div>
+
+                    <div class="form-control-with-icon py-1" v-if="!hideSearch && (tag || entries.length > 0)">
+                        <div class="icon-wrapper">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="icon">
+                                <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <input type="text" class="form-control w-100" id="searchInput" placeholder="Search Tag" v-model="tag" @input.stop="search">
+                    </div>
+
+                    <div class="py-1">
+                        <button type="button" class="w-100 btn btn-sm btn-secondary" style="border-radius: 20px;" @click="resetFilter()">Reset Filters</button>
                     </div>
                 </div>
             </div>
-            <div class="p-1">
-                <button type="button" class="btn btn-secondary" @click="resetFilter()">Reset Filters</button>
+
+            <div class="d-flex flex-column col-3">
+                <div class="form-check m-1">
+                    <input class="form-check-input" type="checkbox" value="" id="useTimeZone" v-model="useTimeZone" @input.stop="search">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Use UTC
+                    </label>
+                </div>
             </div>
+
+
         </div>
 
         <p v-if="recordingStatus !== 'enabled'" class="mt-0 mb-0 disabled-watcher d-flex align-items-center">
@@ -450,7 +466,7 @@
         </div>
 
 
-        <table id="indexScreen" class="table table-hover table-sm mb-0 penultimate-column-right" v-if="ready && entries.length > 0">
+        <table id="indexScreen" class="table table-hover mb-0 penultimate-column-right" v-if="ready && entries.length > 0">
             <thead>
             <slot name="table-header"></slot>
             </thead>
@@ -458,7 +474,7 @@
 
             <transition-group tag="tbody" name="list">
                 <tr v-if="hasNewEntries" key="newEntries" class="dontanimate">
-                    <td colspan="100" class="text-center card-bg-secondary py-1">
+                    <td colspan="100" class="text-center card-bg-secondary py-2">
                         <small><a href="#" v-on:click.prevent="loadNewEntries" v-if="!loadingNewEntries">Load New Entries</a></small>
 
                         <small v-if="loadingNewEntries">Loading...</small>
@@ -472,7 +488,7 @@
 
 
                 <tr v-if="hasMoreEntries" key="olderEntries" class="dontanimate">
-                    <td colspan="100" class="text-center card-bg-secondary py-1">
+                    <td colspan="100" class="text-center card-bg-secondary py-2">
                         <small><a href="#" v-on:click.prevent="loadOlderEntries" v-if="!loadingMoreEntries">Load Older Entries</a></small>
 
                         <small v-if="loadingMoreEntries">Loading...</small>

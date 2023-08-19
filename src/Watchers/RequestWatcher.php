@@ -45,8 +45,8 @@ class RequestWatcher extends Watcher
         $startTime = defined('LARAVEL_START') ? LARAVEL_START : $event->request->server('REQUEST_TIME_FLOAT');
 
         Telescope::recordRequest(IncomingEntry::make([
-            'ip_address' => $this->getUserIp($event->request),
-            'uri' => str_replace($event->request->root(), '', $event->request->fullUrl()) ?: '/',
+			'ip_address' => $this->getUserIp($event->request),
+			'uri' => str_replace($event->request->root(), '', $event->request->fullUrl()) ?: '/',
             'method' => $event->request->method(),
             'controller_action' => optional($event->request->route())->getActionName(),
             'middleware' => array_values(optional($event->request->route())->gatherMiddleware() ?? []),
@@ -98,9 +98,9 @@ class RequestWatcher extends Watcher
      */
     protected function headers($headers)
     {
-        $headers = collect($headers)->map(function ($header) {
-            return $header[0];
-        })->toArray();
+        $headers = collect($headers)
+            ->map(fn ($header) => implode(', ', $header))
+            ->all();
 
         return $this->hideParameters($headers,
             Telescope::$hiddenRequestHeaders
@@ -245,7 +245,7 @@ class RequestWatcher extends Watcher
         })->toArray();
     }
 
-	private function getUserIp($request) {
+	public function getUserIp($request) {
 		foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key) {
 			if (array_key_exists($key, $_SERVER) === true) {
 				foreach (explode(',', $_SERVER[$key]) as $ip) {
