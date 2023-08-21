@@ -312,15 +312,22 @@ class IncomingEntry
      */
     public function toArray()
     {
-        return [
-            'uuid' => $this->uuid,
-			'ip' => json_decode($this->content, true)['ip_address'] ?? null,
-            'batch_id' => $this->batchId,
-            'family_hash' => $this->familyHash,
-            'type' => $this->type,
-            'content' => $this->content,
-            'created_at' => $this->recordedAt->toDateTimeString(),
-        ];
+		$ip=null;
+		if($this->type === 'request'){
+			try {
+				$ip = json_decode($this->content, true)['ip_address'] ?? null;
+			}catch(\Throwable $e){}
+		}
+
+		return [
+			'uuid' => $this->uuid,
+			'ip' => $ip,
+			'batch_id' => $this->batchId,
+			'family_hash' => $this->familyHash,
+			'type' => $this->type,
+			'content' => $this->content,
+			'created_at' => $this->recordedAt->toDateTimeString(),
+		];
     }
 
 }
