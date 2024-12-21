@@ -45,8 +45,8 @@ class RequestWatcher extends Watcher
         $startTime = defined('LARAVEL_START') ? LARAVEL_START : $event->request->server('REQUEST_TIME_FLOAT');
 
         Telescope::recordRequest(IncomingEntry::make([
-			'ip_address' => $this->getUserIp($event->request),
-			'uri' => str_replace($event->request->root(), '', $event->request->fullUrl()) ?: '/',
+            'ip_address' => $event->request->ip(),
+            'uri' => str_replace($event->request->root(), '', $event->request->fullUrl()) ?: '/',
             'method' => $event->request->method(),
             'controller_action' => optional($event->request->route())->getActionName(),
             'middleware' => array_values(optional($event->request->route())->gatherMiddleware() ?? []),
@@ -244,18 +244,4 @@ class RequestWatcher extends Watcher
             }
         })->toArray();
     }
-
-	public function getUserIp($request) {
-		foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key) {
-			if (array_key_exists($key, $_SERVER) === true) {
-				foreach (explode(',', $_SERVER[$key]) as $ip) {
-					$ip = trim($ip); // just to be safe
-					if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
-						return $ip;
-					}
-				}
-			}
-		}
-		return $request->ip(); // it will return server ip when no client ip found
-	}
 }

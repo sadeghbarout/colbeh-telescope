@@ -4,8 +4,6 @@ namespace Laravel\Telescope;
 
 use Illuminate\Support\Str;
 use Laravel\Telescope\Contracts\EntriesRepository;
-use Illuminate\Support\Facades\Log;
-use Laravel\Telescope\Watchers\RequestWatcher;
 
 class IncomingEntry
 {
@@ -225,6 +223,26 @@ class IncomingEntry
     }
 
     /**
+     * Determine if the incoming entry is a event entry.
+     *
+     * @return bool
+     */
+    public function isEvent()
+    {
+        return $this->type === EntryType::EVENT;
+    }
+
+    /**
+     * Determine if the incoming entry is a cache entry.
+     *
+     * @return bool
+     */
+    public function isCache()
+    {
+        return $this->type === EntryType::CACHE;
+    }
+
+    /**
      * Determine if the incoming entry is an authorization gate check.
      *
      * @return bool
@@ -276,6 +294,16 @@ class IncomingEntry
     }
 
     /**
+     * Determine if the incoming entry is a log entry.
+     *
+     * @return bool
+     */
+    public function isLog()
+    {
+        return $this->type === EntryType::LOG;
+    }
+
+    /**
      * Determine if the incoming entry is a scheduled task.
      *
      * @return bool
@@ -312,22 +340,21 @@ class IncomingEntry
      */
     public function toArray()
     {
-		$ip=null;
-		if($this->type === 'request'){
-			try {
-				$ip = json_decode($this->content, true)['ip_address'] ?? null;
-			}catch(\Throwable $e){}
-		}
+        $ip=null;
+        if($this->type === 'request'){
+            try {
+                $ip = json_decode($this->content, true)['ip_address'] ?? null;
+            }catch(\Throwable $e){}
+        }
 
-		return [
-			'uuid' => $this->uuid,
-			'ip' => $ip,
-			'batch_id' => $this->batchId,
-			'family_hash' => $this->familyHash,
-			'type' => $this->type,
-			'content' => $this->content,
-			'created_at' => $this->recordedAt->toDateTimeString(),
-		];
+        return [
+            'uuid' => $this->uuid,
+            'ip' => $ip,
+            'batch_id' => $this->batchId,
+            'family_hash' => $this->familyHash,
+            'type' => $this->type,
+            'content' => $this->content,
+            'created_at' => $this->recordedAt->toDateTimeString(),
+        ];
     }
-
 }

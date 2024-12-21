@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="shortcut icon" href="{{ asset('/vendor/telescope/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ asset('/vendor/telescope/logo.png') }}">
 
     <meta name="robots" content="noindex, nofollow">
 
@@ -39,11 +39,13 @@
                 </div>
             </div>
 
-            <button class="btn btn-muted  mr-3 d-flex ml-auto align-items-center py-2" v-on:click.prevent="removeEntries" title="Delete entries from the previous 10 days">
+
+
+            <button class="btn btn-muted ml-auto mr-3 d-flex align-items-center py-2" v-on:click.prevent="removeEntries" :title="recording ? 'Pause recording' : 'Resume recording'">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"  class="icon fill-primary"><!-- Font Awesome Pro 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) --><path d="M256.47 216.77l86.73 109.18s-16.6 102.36-76.57 150.12C206.66 523.85 0 510.19 0 510.19s3.8-23.14 11-55.43l94.62-112.17c3.97-4.7-.87-11.62-6.65-9.5l-60.4 22.09c14.44-41.66 32.72-80.04 54.6-97.47 59.97-47.76 163.3-40.94 163.3-40.94zM636.53 31.03l-19.86-25c-5.49-6.9-15.52-8.05-22.41-2.56l-232.48 177.8-34.14-42.97c-5.09-6.41-15.14-5.21-18.59 2.21l-25.33 54.55 86.73 109.18 58.8-12.45c8-1.69 11.42-11.2 6.34-17.6l-34.09-42.92 232.48-177.8c6.89-5.48 8.04-15.53 2.55-22.44z"/></svg>
             </button>
 
-            <button class="btn btn-muted  mr-3 d-flex align-items-center py-2" v-on:click.prevent="toggleRecording" :title="recording ? 'Pause recording' : 'Resume recording'">
+            <button class="btn btn-muted mr-3 d-flex align-items-center py-2" v-on:click.prevent="toggleRecording" :title="recording ? 'Pause recording' : 'Resume recording'">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="icon" fill="currentColor" v-if="recording">
                     <path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z" />
                 </svg>

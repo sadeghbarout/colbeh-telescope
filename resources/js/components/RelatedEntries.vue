@@ -144,7 +144,7 @@
             queriesSummary() {
                 return {
                     time: _.reduce(this.queries, (time, q) => { return time + parseFloat(q.content.time) }, 0.00).toFixed(2),
-                    duplicated: this.queries.length - _.size(_.groupBy(this.queries, (q) => { return q.content.hash })),
+                    duplicated: this.queries.length - _.size(_.groupBy(this.queries, (q) => { return `${q.content.hash}-${q.content.connection}` })),
                 };
             },
 
@@ -594,7 +594,6 @@
                     <th>URI</th>
                     <th>Status</th>
                     <th class="text-right">Happened</th>
-                    <th>Duration</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -617,12 +616,6 @@
 
                     <td class="table-fit text-right text-muted" :data-timeago="entry.created_at" :title="entry.created_at">
                         {{timeAgo(entry.created_at)}}
-                    </td>
-
-                    <td class="table-fit text-right text-muted">
-                        <span v-if="entry.content.duration !== undefined">
-                            {{entry.content.duration}} ms
-                        </span>
                     </td>
 
                     <td class="table-fit">

@@ -3,6 +3,7 @@
 namespace Laravel\Telescope\Storage;
 
 use DateTimeInterface;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Laravel\Telescope\Contracts\ClearableRepository;
@@ -43,7 +44,7 @@ class DatabaseEntriesRepository implements Contract, ClearableRepository, Prunab
      * @param  int  $chunkSize
      * @return void
      */
-    public function __construct(string $connection, int $chunkSize = null)
+    public function __construct(string $connection, ?int $chunkSize = null)
     {
         $this->connection = $connection;
 
@@ -189,14 +190,18 @@ class DatabaseEntriesRepository implements Contract, ClearableRepository, Prunab
     protected function storeTags(Collection $results)
     {
         $results->chunk($this->chunkSize)->each(function ($chunked) {
-            $this->table('telescope_entries_tags')->insert($chunked->flatMap(function ($tags, $uuid) {
-                return collect($tags)->map(function ($tag) use ($uuid) {
-                    return [
-                        'entry_uuid' => $uuid,
-                        'tag' => $tag,
-                    ];
-                });
-            })->all());
+            try {
+                $this->table('telescope_entries_tags')->insert($chunked->flatMap(function ($tags, $uuid) {
+                    return collect($tags)->map(function ($tag) use ($uuid) {
+                        return [
+                            'entry_uuid' => $uuid,
+                            'tag' => $tag,
+                        ];
+                    });
+                })->all());
+            } catch (UniqueConstraintViolationException $e) {
+                // Ignore tags that already exist...
+            }
         });
     }
 
@@ -246,14 +251,18 @@ class DatabaseEntriesRepository implements Contract, ClearableRepository, Prunab
     protected function updateTags($entry)
     {
         if (! empty($entry->tagsChanges['added'])) {
-            $this->table('telescope_entries_tags')->insert(
-                collect($entry->tagsChanges['added'])->map(function ($tag) use ($entry) {
-                    return [
-                        'entry_uuid' => $entry->uuid,
-                        'tag' => $tag,
-                    ];
-                })->toArray()
-            );
+            try {
+                $this->table('telescope_entries_tags')->insert(
+                    collect($entry->tagsChanges['added'])->map(function ($tag) use ($entry) {
+                        return [
+                            'entry_uuid' => $entry->uuid,
+                            'tag' => $tag,
+                        ];
+                    })->toArray()
+                );
+            } catch (UniqueConstraintViolationException $e) {
+                // Ignore tags that already exist...
+            }
         }
 
         collect($entry->tagsChanges['removed'])->each(function ($tag) use ($entry) {
@@ -339,12 +348,17 @@ class DatabaseEntriesRepository implements Contract, ClearableRepository, Prunab
      * Prune all of the entries older than the given date.
      *
      * @param  \DateTimeInterface  $before
+     * @param  bool  $keepExceptions
      * @return int
      */
-    public function prune(DateTimeInterface $before)
+    public function prune(DateTimeInterface $before, $keepExceptions)
     {
         $query = $this->table('telescope_entries')
                 ->where('created_at', '<', $before);
+
+        if ($keepExceptions) {
+            $query->where('type', '!=', 'exception');
+        }
 
         $totalDeleted = 0;
 
@@ -364,8 +378,13 @@ class DatabaseEntriesRepository implements Contract, ClearableRepository, Prunab
      */
     public function clear()
     {
-        $this->table('telescope_entries')->delete();
-        $this->table('telescope_monitoring')->delete();
+        do {
+            $deleted = $this->table('telescope_entries')->take($this->chunkSize)->delete();
+        } while ($deleted !== 0);
+
+        do {
+            $deleted = $this->table('telescope_monitoring')->take($this->chunkSize)->delete();
+        } while ($deleted !== 0);
     }
 
     /**

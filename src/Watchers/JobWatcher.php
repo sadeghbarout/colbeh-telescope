@@ -4,6 +4,7 @@ namespace Laravel\Telescope\Watchers;
 
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Queue;
@@ -60,7 +61,11 @@ class JobWatcher extends Watcher
             return;
         }
 
-        if (in_array(get_class($payload['data']['command']), $this->ignoredJobClasses)) {
+        $job = isset($payload['data']['command'])
+            ? get_class($payload['data']['command'])
+            : $payload['job'];
+
+        if (in_array($job, $this->ignoredJobClasses)) {
             return;
         }
 
@@ -198,29 +203,29 @@ class JobWatcher extends Watcher
      */
     protected function updateBatch($payload)
     {
+        if (! isset($payload['data']['command'])) {
+            return;
+        }
+
         $wasRecordingEnabled = Telescope::$shouldRecord;
 
         Telescope::$shouldRecord = false;
 
-        $command = $this->getCommand($payload['data']);
+        $batchId = $this->getBatchId($payload['data']);
 
         if ($wasRecordingEnabled) {
             Telescope::$shouldRecord = true;
         }
 
-        $properties = ExtractProperties::from(
-            $command
-        );
-
-        if (isset($properties['batchId'])) {
-            $batch = app(BatchRepository::class)->find($properties['batchId']);
+        if (! is_null($batchId)) {
+            $batch = app(BatchRepository::class)->find($batchId);
 
             if (is_null($batch)) {
                 return;
             }
 
             Telescope::recordUpdate(EntryUpdate::make(
-                $properties['batchId'], EntryType::BATCH, $batch->toArray()
+                $batchId, EntryType::BATCH, $batch->toArray()
             ));
         }
     }
@@ -244,5 +249,30 @@ class JobWatcher extends Watcher
         }
 
         throw new RuntimeException('Unable to extract job payload.');
+    }
+
+    /**
+     * Get the batch ID from the given payload.
+     *
+     * @param  array  $data
+     * @return int|null
+     *
+     * @throws \RuntimeException
+     */
+    protected function getBatchId(array $data)
+    {
+        try {
+            $command = $this->getCommand($data);
+
+            $properties = ExtractProperties::from($command);
+
+            return $properties['batchId'] ?? null;
+        } catch (ModelNotFoundException $e) {
+            if (preg_match('/"batchId";s:\d+:"([^"]+)"/', $data['command'], $matches)) {
+                return $matches[1];
+            }
+        }
+
+        return null;
     }
 }
