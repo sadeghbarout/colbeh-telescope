@@ -18,6 +18,13 @@ class TelescopeServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+
+        if (request()->has('useOldDB')) {
+            config(['telescope.storage.database.connection' =>
+                config('telescope.storage.database.connection_backup')]);
+        }
+
+
         $this->registerCommands();
         $this->registerPublishing();
 
@@ -159,7 +166,10 @@ class TelescopeServiceProvider extends ServiceProvider
 
         $this->app->when(DatabaseEntriesRepository::class)
             ->needs('$connection')
-            ->give(config('telescope.storage.database.connection'));
+            ->give(request()->has('useOldDB')?
+                    config('telescope.storage.database.connection_backup'):
+                    config('telescope.storage.database.connection')
+            );
 
         $this->app->when(DatabaseEntriesRepository::class)
             ->needs('$chunkSize')

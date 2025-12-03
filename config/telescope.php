@@ -60,6 +60,7 @@ return [
     'storage' => [
         'database' => [
             'connection' => env('DB_CONNECTION', 'mysql'),
+            'connection_backup' => env('DB_CONNECTION_BACKUP', 'mysql'),
             'chunk' => 1000,
         ],
     ],

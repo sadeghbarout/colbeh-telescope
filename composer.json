@@ -1,5 +1,6 @@
 {
     "name": "colbeh/telescope",
+    "version": "5.2.16.2",
     "description": "An elegant debug assistant for the Laravel framework.",
     "keywords": ["laravel", "monitoring", "debugging"],
     "license": "MIT",

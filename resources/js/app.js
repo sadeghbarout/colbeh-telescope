@@ -15,6 +15,39 @@ if (token) {
     axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 }
 
+
+
+// --------------------------------------------------------------
+// useOldDB
+
+const urlParams = new URLSearchParams(window.location.search);
+
+if (urlParams.has('useOldDB')==1 && urlParams.get('useOldDB')==1) {
+    // Save mode in localStorage so refresh+ajax keep it
+    localStorage.setItem('telescope_useOldDB', '1');
+}
+
+// If user cleared mode by query
+if (urlParams.has('useMainDB') || (urlParams.has('useOldDB')==1 && urlParams.get('useOldDB')==0) ) {
+    localStorage.removeItem('telescope_useOldDB');
+}
+
+// Read final state
+const forceOldDB = localStorage.getItem('telescope_useOldDB') === '1';
+
+// Axios interceptor
+if (typeof axios !== 'undefined') {
+    axios.interceptors.request.use(config => {
+        if (forceOldDB) {
+            config.params = config.params || {};
+            config.params.useOldDB = 1;
+        }
+        return config;
+    }, error => Promise.reject(error));
+}
+// --------------------------------------------------------------
+
+
 Vue.use(VueRouter);
 
 window.Popper = require('popper.js').default;
